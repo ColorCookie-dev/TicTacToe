@@ -1,0 +1,34 @@
+{% extends "game/abstract.html" %}
+{% block title %}Login{% endblock %}
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static "game/styles.css" %}"/>
+    <style>
+        body { background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%); }
+    </style>
+{% endblock %}
+
+{% block authbtn1url %}{% url 'signup' %}{% endblock %}
+{% block authbtn1text %}SignUp{% endblock %}
+{% block authbtn2url %}{% url 'game:game' %}{% endblock %}
+{% block authbtn2text %}Back To Game{% endblock %}
+
+{% block body %}
+    <div class="{% block outerdivclass %}logindiv{% endblock %}">
+        {% if not user.is_authenticated %}
+            {% block authed %}
+            <h2 align="center" class="loginh2">{% block authedtitle %}Login{% endblock %}</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="loginform">{{ form.as_p }}</div>
+                <button class="submitbtn" type="submit">{% block submitBtnValue %}Sign In{% endblock %}</button>
+            </form>
+            {% endblock %}
+        {% else %}
+            {% block notauthed %}
+            <a class="logouth2" href="{% url 'logout' %}">logout</a><br/>
+            <p class="simplepara">You are logged in as {{ user.username }}</p>
+            {% endblock %}
+        {% endif %}
+    </div>
+{% endblock %}

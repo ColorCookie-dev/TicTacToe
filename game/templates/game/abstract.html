@@ -1,0 +1,39 @@
+<!doctypehtml>
+<html>
+    <head>
+        <title>{% block title %}TicTacToe{% endblock %}</title>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static "game/abstract_styles.css" %}"/>
+        <script>
+            document.getElementById("authdivbtnLogin").onclick = function () {
+                window.location.href = 
+            };
+            document.getElementById("authdivbtnSignUp").onclick = function () {
+            };
+            document.getElementById("authdivbtnLogout").onclick = function () {
+                window.location.href = "{% url 'logout' %}"
+            };
+        </script>
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body>
+        <div class="authdiv">
+            <form>
+            {% if not user.is_authenticated %}
+            
+            <button type="submit" id="authdivbtnLogin" class="authdivbtn" formaction="{% block authbtn1url %}{% url 'login' %}{% endblock %}">{% block authbtn1text %}Login{% endblock %}</button><br>
+            <button type="submit" id="authdivbtnSignUp" class="authdivbtn" formaction="{% block authbtn2url %}{% url 'signup' %}{% endblock %}">{% block authbtn2text %}SignUp{% endblock %}</button><br>
+            {% else %}
+            <button type="submit" id="authdivbtnLogout" class="authdivbtn" formaction="{% url 'logout' %}">
+                Logout from {{ user.username }}
+            </button>
+            <button type="submit" id="authdivbtnSettings" class="authdivbtn"
+                formaction="{% url 'AccSettings' %}"> Settings </button>
+            {% endif %}
+            </form>
+        </div>
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,27 @@
+div.authdiv {
+    position: fixed;
+    background-color: #17202a;
+    border-radius: 15px;
+    display: inline-block;
+    top: 10px;
+    right: 10px;
+    padding: 3px;
+    box-shadow: 4px 5px #13193e;
+}
+
+.authdivbtn {
+    font-family: 'B612', sans-serif;
+    font-size: 140%;
+    font-style: bold;
+    border-radius: 15px;
+    background-color: #17202a;
+    color: #fbfcfc;
+    border: none;
+    height: 38px;
+    width: 150px;
+}
+
+#authdivbtnLogout {
+    display: inline-block;
+    width: 150px;
+}
