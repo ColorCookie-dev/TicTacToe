@@ -4,39 +4,58 @@
 {% block head %}
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'game/styles.css' %}">
+
     <style>
         body { overflow: hidden; }
-        .authdiv { box-shadow: 4px 5px #888888; }
     </style>
+
     <script>
-    var symbol = "X";
-    var settedSquares = [];
-    function CngPlyr() { 
-        if (symbol === "X") symbol = "O";
-        else symbol = "X";
-    }
-    function set(i, j) {
-        if (settedSquares.includes([i, j])) return false;
-        settedSquares.push([i, j]);
-        document.getElementById("BlockBtn" + i + "_" + j).innerHTML = symbol;
-        return true;
-    }
-    function btnClk(i, j) {
-        if (!set(i, j)) return;
-        CngPlyr();
-    }
+			// At the moment the game is controlled by javascript
+			// and there is no server to control the game and send the data to
+			var symbol = "X";
+			var settedSquares = [];
+			function CngPlyr() { 
+					if (symbol === "X") symbol = "O";
+					else symbol = "X";
+			}
+			function set(i, j) {
+					if (settedSquares.includes([i, j])) return false;
+					settedSquares.push([i, j]);
+					document.getElementById("BlockBtn" + i + "_" + j).innerHTML = symbol;
+					return true;
+			}
+			function btnClk(i, j) {
+					if (!set(i, j)) return;
+					CngPlyr();
+			}
     </script>
+
 {% endblock %}
+
 {% block body %}
-    <div class="gamediv">
-    <table class="gametbl">
-        {% for row in row_range %}
-        <tr>
-            {% for col in col_range %}
-            <td><button class="BlockBtn" id="BlockBtn{{ row }}_{{ col }}" onclick="btnClk({{ row }}, {{ col }})"></button></td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
-    </div>
+
+{% load mathfilters %}
+<style>
+	.gamediv {
+		width: {{ divide|sub:3|mul:100|add:415 }}px;
+		height: {{ divide|sub:3|mul:100|add:415 }}px;
+	}
+</style>
+
+<div class="gamediv">
+	<table class="gametbl">
+
+		{% for row in divide_range %}
+		<tr>
+			{% for col in divide_range %}
+				<td>
+					<button class="BlockBtn" id="BlockBtn{{ row }}_{{ col }}" onclick="btnClk({{ row }}, {{ col }})"></button>
+				</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+
+	</table>
+</div>
+
 {% endblock %}

@@ -3,19 +3,12 @@ from django.http import HttpResponse
 from django.views import generic
 
 
-def SingleGameView(request):
+def game(request):
+    divide = 5
     return render(request, 'game/game.html', {
-            'single': True,
-            'row_range': range(3),
-            'col_range': range(3),
+            'divide': divide,
+            'divide_range': range(divide),
         })
 
-def MultiGameView(request):
-    return render(request, 'game/game.html', {
-            'single': False,
-            'row_range': range(3),
-            'col_range': range(3),
-        })
-
-def game(request, game_id):
-    pass
+# def game(request, game_id):
+    # pass

@@ -11,44 +11,30 @@ body {
     color: #b3b6b7;
 }
 
-.gamediv, .logindiv, .signupdiv {
-    /* background-image: linear-gradient(to bottom, #434343 0%, black 100%); */
-    position: absolute;
-    left: 32vw;
-    width: 34.45%;
-    background: #17202a;
-    border-radius: 15px;
-    display: inline-block;
-    box-shadow: 10px 13px #13193e;
-}
-
-.signupdiv {
-    top: 15vh;
-    padding: 15px;
-}
-
-.logindiv {
-    top: 27vh;
-    padding: 15px;
-}
-
 .gamediv {
-    display: block;
-    top: 22vh;
-    left: 36vw;
-    width: 415px;
-    height: 415px;
-    box-shadow: 10px 13px #888888;
+	/* background-image: linear-gradient(to bottom, #434343 0%, black 100%); */
+	background: #17202a;
+	border-radius: 15px;
+	box-shadow: 10px 13px #888888;
+
+	top: 50%;
+	left: 50%;
+	width: 415px;
+	height: 415px;
+	position: absolute;
+	transform: translate(-50%, -50%);
 }
 
 .gametbl {
     padding: 0;
-    margin: 0;
-    display: block;
-    width: 315px;
-    height: 315px;
-    margin-left: 50px;
-    padding-top: 50px;
+    /*margin: 0;*/
+    /*display: block;*/
+		top: 50%;
+		left: 50%;
+    /*width: 315px;*/
+    /*height: 315px;*/
+		position: absolute;
+		transform: translate(-50%, -50%);
 }
 
 .BlockBtn { 
@@ -63,30 +49,6 @@ body {
     color: #17202a;
     /* background-color: #FFA07A; */
     background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
-}
-
-.loginform label {
-    color: #117a65;
-    font: bold;
-    font-size: 125%;
-    font-weight: 700;
-    font-family: 'B612', sans-serif;
-    position: relative;
-    margin-top: 1%;
-}
-
-.loginh2, .logouth2 {
-    color: #e74c3c;
-    font-size: 250%;
-    font-family: 'B612', sans-serif;
-    font-weight: 730;
-}
-
-.logouth2 {
-    width: 40%;
-    height: 50px;
-    margin-top: 20%;
-    margin-left: 35%;
 }
 
 .submitbtn {
@@ -111,37 +73,6 @@ body {
     font-size: 150%;
     font-family: 'B612', sans-serif;
     font-weight: 700;
-}
-
-#id_username, #id_password, #id_password1, #id_password2, #id_email {
-    font-family: 'B612', sans-serif;
-    font-size: 120%;
-    background-color: #212f3c;
-    color: #b3b6b7;
-    padding-left: 10px;
-    padding-right: 10px;
-    border: none;
-    width: 63%;
-    height: 33px;
-    border-radius: 15px;
-    margin-top: 1%;
-    margin-left: 9px;
-}
-
-#id_username {
-    margin-left: 75px;
-}
-
-#id_email {
-    margin-left: 40px;
-}
-
-#id_password, #id_password1 {
-    margin-left: 77px;
-}
-
-#id_password2 {
-    margin-left: 10px;
 }
 
 span.helptext, li {

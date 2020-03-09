@@ -27,16 +27,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_REDIRECT_URL = '/game/'
-LOGOUT_REDIRECT_URL = '/game/'
-AUTH_USER_MODEL = 'accounts.User'
+# LOGIN_REDIRECT_URL = '/game/'
+# LOGOUT_REDIRECT_URL = '/game/'
+# AUTH_USER_MODEL = 'accounts.User'
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'mathfilters',
     'game.apps.GameConfig',
-    'accounts.apps.AccountsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
