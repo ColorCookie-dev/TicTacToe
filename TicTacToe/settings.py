@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'mathfilters',
+    'gameserver.apps.GameserverConfig',
     'game.apps.GameConfig',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -25,22 +25,38 @@ body {
 	transform: translate(-50%, -50%);
 }
 
+#WinText {
+	color: olivedrab;
+	border: 5px;
+	font-size: 800%;
+	text-align: center;
+	/*text-shadow: -1px -1px 0 #ccc, 1px -1px 0 #ccc, -1px 1px 0 #ccc, 1px 1px 0 #ccc;*/
+
+	left: 0;
+    line-height: 200px;
+    margin: auto;
+    margin-top: -100px;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+}
+
 .gametbl {
     padding: 0;
     /*margin: 0;*/
     /*display: block;*/
-		top: 50%;
-		left: 50%;
+	top: 50%;
+	left: 50%;
     /*width: 315px;*/
     /*height: 315px;*/
-		position: absolute;
-		transform: translate(-50%, -50%);
+	position: absolute;
+	transform: translate(-50%, -50%);
 }
 
 .BlockBtn { 
     height: 100px;
     width: 100px;
-    align: center;
+    text-align: center;
     padding: 0;
     margin: 0;
     border: none;
