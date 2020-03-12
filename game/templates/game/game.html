@@ -24,7 +24,10 @@ function SetTile(gameobj) {
 	var symbol = "";
 	if (gameobj[0] == 0) { player = 1; symbol = "X"; }
 	else { player = 0; symbol = "O"; }
-	document.getElementById("BlockBtn" + gameobj[2] + "_" + gameobj[1]).innerHTML = symbol;
+	var scal = parseInt(gameobj[1], 10);
+	var x = scal % parseInt({{ tiles }}, 10);
+	var y = (scal - scal % parseInt({{ tiles }}, 10)) / parseInt({{tiles}}, 10);
+	document.getElementById("BlockBtn" + y + "_" + x).innerHTML = symbol;
 }
 
 function btnClk(j, i) {
@@ -32,7 +35,7 @@ function btnClk(j, i) {
 		"/gs/{{ tiles }}",
 		{
 			gid: game_id,
-			'move[]': [player, i, j],
+			'move[]': [player, parseInt(i, 10) + (parseInt({{tiles}}, 10) * parseInt(j, 10))],
 			csrfmiddlewaretoken: '{{ csrf_token }}'
 		},
 		function (data, status) {}

@@ -15,6 +15,3 @@ def game(request, tiles):
         'tiles_range': range(tiles),
         })
 
-def create_game(request, tiles=3):
-    game_id = CreateGame(tiles)
-    return HttpResponseRedirect("/?gid={}".format(game_id))
