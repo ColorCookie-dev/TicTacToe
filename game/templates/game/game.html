@@ -27,10 +27,10 @@ function SetTile(gameobj) {
 	var scal = parseInt(gameobj[1], 10);
 	var x = scal % parseInt({{ tiles }}, 10);
 	var y = (scal - scal % parseInt({{ tiles }}, 10)) / parseInt({{tiles}}, 10);
-	document.getElementById("BlockBtn" + y + "_" + x).innerHTML = symbol;
+	document.getElementById("BlockBtn" + x + "_" + y).innerHTML = symbol;
 }
 
-function btnClk(j, i) {
+function btnClk(i, j) {
 	$.post(
 		"/gs/{{ tiles }}",
 		{
@@ -111,8 +111,8 @@ var refreshId = setInterval(function () {
 		<tr>
 			{% for col in tiles_range %}
 			<td>
-				<button class="BlockBtn" id="BlockBtn{{ row }}_{{ col }}"
-					onclick="btnClk({{ row }}, {{ col }})"></button>
+				<button class="BlockBtn" id="BlockBtn{{ col }}_{{ row }}"
+					onclick="btnClk({{ col }}, {{ row }})"></button>
 			</td>
 			{% endfor %}
 		</tr>
