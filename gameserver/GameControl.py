@@ -1,25 +1,60 @@
 import string
 import random
 
-id_length = 5
+
+# game_state stucture [moves]
+# moves stucture [player, tile_scaler]
+# gameobj stucture { 'tiles': tiles, 'win': "", 'game_state': game_state }
+
+id_length = 10
 
 games = {}
 
-def CreateGame(tiles):
-    game_id = str(random.choices(string.ascii_letters, k=id_length))
+# ========= Abstractions
+def IdExists(game_id):
     try:
         if games[game_id]: pass
-        return CreateGame(tiles)
+        return True
     except:
-        games[game_id] = {
-                'tiles': tiles,
-                'win': "",
-                'game_state': []
-                }
-        return {
-                "gid": game_id
-                }
+        return False
 
+def CreateGameImpl(game_id, tiles):
+    games[game_id] = {
+            'tiles': tiles,
+            'win': "",
+            'game_state': []
+            }
+
+def isGameEnded(game_id):
+    if not games[game_id]['win']:
+        return False
+    return True
+
+def getTiles(game_id):
+    return games[game_id]['tiles']
+
+def getGameState(game_id):
+    return games[game_id]['game_state']
+
+def RetGameImpl(game_id):
+    try:
+        gameobj = games[game_id]
+        return gameobj
+    except KeyError:
+        return None
+
+def addMove(game_id, move):
+    pass
+
+def EndGame(game_id, outcome, player):
+    if outcome == True:
+        games[game_id]['win'] = player
+    elif outcome == -1:
+        games[game_id]['win'] = "-1"
+
+# ======== END Abstractions
+
+# ======== Helper Function
 def Vec2Scal(tiles, x, y):
     return (tiles*y) + x
 
@@ -33,6 +68,16 @@ def CheckSet(game_state, scal):
         if (i[1] == scal):
             return True
     return False
+
+# ======= END Helper
+
+def CreateGame(tiles):
+    game_id = str(random.choices(string.ascii_letters, k=id_length))
+    if IdExists(game_id):
+        return CreateGame(tiles)
+
+    CreateGameImpl(game_id, tiles)
+    return { "gid": game_id }
 
 def CheckWin(game_state, tiles, recent_move): # Accepts integers in recent_move parameter
 
@@ -94,9 +139,11 @@ def CheckWin(game_state, tiles, recent_move): # Accepts integers in recent_move 
 
 def Move(game_id, gameobj):
     try:
-        if not games[game_id]['win']:
+        if not IdExists(game_id):
+            return False
+        if not isGameEnded(game_id):
             player, scal_val = gameobj
-            tiles = games[game_id]['tiles']
+            tiles = getTiles(game_id)
             scal = int(scal_val)
             x, y = Scal2Vec(tiles, scal)
 
@@ -109,18 +156,16 @@ def Move(game_id, gameobj):
                 return False
 
             # Getting the last move and checking the player
-            game_state = games[game_id]['game_state']
+            game_state = getGameState(game_id)
             if len(game_state) == 0 or game_state[-1][0] != int(player):
 
                 if CheckSet(game_state, scal):
                     return False
 
                 game_state.append([int(player), scal])
+                addMove(game_id, [int(player), scal]) # For DataBase Only
                 outcome = CheckWin(game_state, tiles, [int(player), scal])
-                if outcome == True:
-                    games[game_id]['win'] = player
-                elif outcome == -1:
-                    games[game_id]['win'] = "-1"
+                EndGame(game_id, outcome, player) # Does the checking itself
 
     except KeyError: return False
     except TypeError: return False
@@ -128,10 +173,4 @@ def Move(game_id, gameobj):
 
 
 def RetGame(game_id):
-    try:
-        gameobj = games[game_id]
-        if gameobj['win'] != "":
-            del games[game_id]
-        return gameobj
-    except KeyError:
-        return None
+    return RetGameImpl(game_id)
