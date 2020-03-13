@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.views import generic
-from gameserver.GameControl import CreateGame, RetGame
 
 
 def game(request, tiles):

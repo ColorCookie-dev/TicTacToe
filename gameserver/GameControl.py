@@ -10,142 +10,181 @@ id_length = 10
 
 games = {}
 
+class backends:
+    python_runtime = 0
+    database = 1
+
+storage_backend = backends.python_runtime
+
 # ========= Abstractions
-def IdExists(game_id):
-    try:
-        if games[game_id]: pass
+def id_exists(game_id):
+    if storage_backend == backends.python_runtime:
+        try:
+            if games[game_id]: pass
+            return True
+        except:
+            return False
+    elif storage_backend == backends.database:
+        pass
+
+def create_game_impl(game_id, tiles):
+    if storage_backend == backends.python_runtime:
+        games[game_id] = {
+                'tiles': tiles,
+                'win': "",
+                'game_state': []
+                }
+    elif storage_backend == backends.database:
+        pass
+
+def is_game_ended(game_id):
+    if storage_backend == backends.python_runtime:
+        if not games[game_id]['win']:
+            return False
         return True
-    except:
-        return False
+    elif storage_backend == backends.database:
+        pass
 
-def CreateGameImpl(game_id, tiles):
-    games[game_id] = {
-            'tiles': tiles,
-            'win': "",
-            'game_state': []
-            }
+def get_tiles(game_id):
+    if storage_backend == backends.python_runtime:
+        return games[game_id]['tiles']
+    elif storage_backend == backends.database:
+        pass
 
-def isGameEnded(game_id):
-    if not games[game_id]['win']:
-        return False
-    return True
+def get_game_state(game_id):
+    if storage_backend == backends.python_runtime:
+        return games[game_id]['game_state']
+    elif storage_backend == backends.database:
+        pass
 
-def getTiles(game_id):
-    return games[game_id]['tiles']
+def del_game_cache(game_id):
+    if storage_backend == backends.python_runtime:
+        del games[game_id]
+    elif storage_backend == backends.database:
+        pass
 
-def getGameState(game_id):
-    return games[game_id]['game_state']
+def ret_game_impl(game_id):
+    if storage_backend == backends.python_runtime:
+        try:
+            gameobj = games[game_id]
+            if is_game_ended(game_id):
+                del_game_cache(game_id) # doesn't need to run if the there is some DB as backend
+            return gameobj
+        except KeyError:
+            return None
+    elif storage_backend == backends.database:
+        pass
 
-def RetGameImpl(game_id):
-    try:
-        gameobj = games[game_id]
-        return gameobj
-    except KeyError:
-        return None
+def add_move(game_id, move):
+    if storage_backend == backends.python_runtime:
+        pass
+    elif storage_backend == backends.database:
+        pass # TODO: Needed replaced to record the move
 
-def addMove(game_id, move):
-    pass
-
-def EndGame(game_id, outcome, player):
-    if outcome == True:
-        games[game_id]['win'] = player
-    elif outcome == -1:
-        games[game_id]['win'] = "-1"
+def end_game(game_id, outcome, player):
+    if storage_backend == backends.python_runtime:
+        if outcome == True:
+            games[game_id]['win'] = player
+        elif outcome == -1:
+            games[game_id]['win'] = "-1"
+    elif storage_backend == backends.database:
+        pass
 
 # ======== END Abstractions
 
 # ======== Helper Function
-def Vec2Scal(tiles, x, y):
+def vec2scal(tiles, x, y):
     return (tiles*y) + x
 
-def Scal2Vec(tiles, scal):
+def scal2vec(tiles, scal):
     x = scal%tiles
     y = scal//tiles
     return (x, y)
 
-def CheckSet(game_state, scal):
+def check_set(game_state, scal):
     for i in game_state:
         if (i[1] == scal):
             return True
     return False
 
-# ======= END Helper
-
-def CreateGame(tiles):
-    game_id = str(random.choices(string.ascii_letters, k=id_length))
-    if IdExists(game_id):
-        return CreateGame(tiles)
-
-    CreateGameImpl(game_id, tiles)
-    return { "gid": game_id }
-
-def CheckWin(game_state, tiles, recent_move): # Accepts integers in recent_move parameter
+def check_win(game_state, tiles, recent_move): # Accepts integers in recent_move parameter
 
     # Check For Draw
     if (len(game_state) == tiles*tiles):
         return -1
 
     player, scal = recent_move
-    x, y = Scal2Vec(tiles, scal)
+    x, y = scal2vec(tiles, scal)
 
     if y >= 2: # Checks Vertically upwards
-        if ([player, Vec2Scal(tiles, x, y-1)] in game_state) and ([player, Vec2Scal(tiles, x, y-2)] in game_state):
+        if ([player, vec2scal(tiles, x, y-1)] in game_state) and ([player, vec2scal(tiles, x, y-2)] in game_state):
             return True
 
         if x >= 2: # Checks Backward Slash Up
-            if ([player, Vec2Scal(tiles, x-1, y-1)] in game_state) and ([player, Vec2Scal(tiles, x-2, y-2)] in game_state):
+            if ([player, vec2scal(tiles, x-1, y-1)] in game_state) and ([player, vec2scal(tiles, x-2, y-2)] in game_state):
                 return True
 
         if x <= tiles-3: # Checks Forward Slash Up
-            if ([player, Vec2Scal(tiles, x+1, y-1)] in game_state) and ([player, Vec2Scal(tiles, x+2, y-2)] in game_state):
+            if ([player, vec2scal(tiles, x+1, y-1)] in game_state) and ([player, vec2scal(tiles, x+2, y-2)] in game_state):
                 return True
 
     if y <= tiles-3: # Checks Vertically downwards
-        if ([player, Vec2Scal(tiles, x, y+1)] in game_state) and ([player, Vec2Scal(tiles, x, y+2)] in game_state):
+        if ([player, vec2scal(tiles, x, y+1)] in game_state) and ([player, vec2scal(tiles, x, y+2)] in game_state):
             return True
 
         if x >= 2: # Checks Backward Slash Down
-            if ([player, Vec2Scal(tiles, x-1, y+1)] in game_state) and ([player, Vec2Scal(tiles, x-2, y+2)] in game_state):
+            if ([player, vec2scal(tiles, x-1, y+1)] in game_state) and ([player, vec2scal(tiles, x-2, y+2)] in game_state):
                 return True
 
         if x <= tiles-3: # Checks Forward Slash Down
-            if ([player, Vec2Scal(tiles, x+1, y+1)] in game_state) and ([player, Vec2Scal(tiles, x+2, y+2)] in game_state):
+            if ([player, vec2scal(tiles, x+1, y+1)] in game_state) and ([player, vec2scal(tiles, x+2, y+2)] in game_state):
                 return True
 
     if x >= 2: # Checks Horizonatally left
-        if ([player, Vec2Scal(tiles, x-1, y)] in game_state) and ([player, Vec2Scal(tiles, x-2, y)] in game_state):
+        if ([player, vec2scal(tiles, x-1, y)] in game_state) and ([player, vec2scal(tiles, x-2, y)] in game_state):
             return True
 
     if x <= tiles-3: # Checks Horizonatally right
-        if ([player, Vec2Scal(tiles, x+1, y)] in game_state) and ([player, Vec2Scal(tiles, x+2, y)] in game_state):
+        if ([player, vec2scal(tiles, x+1, y)] in game_state) and ([player, vec2scal(tiles, x+2, y)] in game_state):
             return True
 
     if (x <= tiles-2) and (x >= 1): # Checks Horizonatally middle
-        if ([player, Vec2Scal(tiles, x+1, y)] in game_state) and ([player, Vec2Scal(tiles, x-1, y)] in game_state):
+        if ([player, vec2scal(tiles, x+1, y)] in game_state) and ([player, vec2scal(tiles, x-1, y)] in game_state):
             return True
 
         if (y <= tiles-2) and (y >= 1): # Checks From Middle diagonally
-            if ([player, Vec2Scal(tiles, x+1, y+1)] in game_state) and ([player, Vec2Scal(tiles, x-1, y-1)] in game_state):
+            if ([player, vec2scal(tiles, x+1, y+1)] in game_state) and ([player, vec2scal(tiles, x-1, y-1)] in game_state):
                 return True
 
-            if ([player, Vec2Scal(tiles, x-1, y+1)] in game_state) and ([player, Vec2Scal(tiles, x+1, y-1)] in game_state):
+            if ([player, vec2scal(tiles, x-1, y+1)] in game_state) and ([player, vec2scal(tiles, x+1, y-1)] in game_state):
                 return True
 
     if (y <= tiles-2) and (y >= 1): # Checks Vertically middle
-        if ([player, Vec2Scal(tiles, x, y+1)] in game_state) and ([player, Vec2Scal(tiles, x, y-1)] in game_state):
+        if ([player, vec2scal(tiles, x, y+1)] in game_state) and ([player, vec2scal(tiles, x, y-1)] in game_state):
             return True
 
     return False
 
-def Move(game_id, gameobj):
+# ======= END Helper
+
+def create_game(tiles):
+    game_id = str(random.choices(string.ascii_letters, k=id_length))
+    if id_exists(game_id):
+        return create_game(tiles)
+
+    create_game_impl(game_id, tiles)
+    return { "gid": game_id }
+
+def move(game_id, gameobj):
     try:
-        if not IdExists(game_id):
+        if not id_exists(game_id):
             return False
-        if not isGameEnded(game_id):
+
+        if not is_game_ended(game_id):
             player, scal_val = gameobj
-            tiles = getTiles(game_id)
+            tiles = get_tiles(game_id)
             scal = int(scal_val)
-            x, y = Scal2Vec(tiles, scal)
+            x, y = scal2vec(tiles, scal)
 
             # For right now there are only 2 players available
             if not (int(player) == 0 or int(player) == 1):
@@ -156,21 +195,21 @@ def Move(game_id, gameobj):
                 return False
 
             # Getting the last move and checking the player
-            game_state = getGameState(game_id)
+            game_state = get_game_state(game_id)
             if len(game_state) == 0 or game_state[-1][0] != int(player):
 
-                if CheckSet(game_state, scal):
+                if check_set(game_state, scal):
                     return False
 
                 game_state.append([int(player), scal])
-                addMove(game_id, [int(player), scal]) # For DataBase Only
-                outcome = CheckWin(game_state, tiles, [int(player), scal])
-                EndGame(game_id, outcome, player) # Does the checking itself
+                add_move(game_id, [int(player), scal]) # For DataBase Only
+                outcome = check_win(game_state, tiles, [int(player), scal])
+                end_game(game_id, outcome, player) # Does the checking itself
 
     except KeyError: return False
     except TypeError: return False
     return True
 
 
-def RetGame(game_id):
-    return RetGameImpl(game_id)
+def ret_game(game_id):
+    return ret_game_impl(game_id)
