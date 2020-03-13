@@ -18,12 +18,10 @@ var won = 0; // Doesn't state if the game has been won or not
 					// it states if the game has ended or not
 
 function SetTile(gameobj) {
-	// Setting the player opposite the player recieved
-	// Beause at the last only the opposite player should be able to play
-	// === This is temporary
+	// Setting the player as the reieved turn, This is temporary
 	var symbol = "";
-	if (gameobj[0] == 0) { player = 1; symbol = "X"; }
-	else { player = 0; symbol = "O"; }
+	if (gameobj[0] == 0) { symbol = "X"; }
+	else if (gameobj[0] == 1) { symbol = "O"; }
 	var scal = parseInt(gameobj[1], 10);
 	var x = scal % parseInt({{ tiles }}, 10);
 	var y = (scal - scal % parseInt({{ tiles }}, 10)) / parseInt({{tiles}}, 10);
@@ -31,15 +29,17 @@ function SetTile(gameobj) {
 }
 
 function btnClk(i, j) {
-	$.post(
-		"/gs/{{ tiles }}",
-		{
-			gid: game_id,
-			'move[]': [player, parseInt(i, 10) + (parseInt({{tiles}}, 10) * parseInt(j, 10))],
-			csrfmiddlewaretoken: '{{ csrf_token }}'
-		},
-		function (data, status) {}
-	);
+	if (won == 0) {
+		$.post(
+			"/gs/{{ tiles }}",
+			{
+				gid: game_id,
+				'move[]': [player, parseInt(i, 10) + (parseInt({{tiles}}, 10) * parseInt(j, 10))],
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			function (data, status) {}
+		);
+	}
 }
 
 var game_id = "";
@@ -64,6 +64,7 @@ function GetGameState() {
 		function(data, status){
 			for (x in data.game_state) {
 				var move = data.game_state[x];
+				player = data.turn;
 				SetTile(move);
 			}
 			if (data.win === "0") {

@@ -1,10 +1,12 @@
 import string
 import random
+from gameserver.models import Game, Move, OutCome, PlayerChoice
 
 
 # game_state stucture [moves]
 # moves stucture [player, tile_scaler]
-# gameobj stucture { 'tiles': tiles, 'win': "", 'game_state': game_state }
+# player :: int (0, 1)
+# gameobj stucture { 'tiles': tiles, 'win': "", turn: player, 'game_state': game_state }
 
 id_length = 10
 
@@ -25,17 +27,22 @@ def id_exists(game_id):
         except:
             return False
     elif storage_backend == backends.database:
-        pass
+        if len(Game.objects.filter(game_id=game_id)):
+            return True
+        else:
+            return False
 
 def create_game_impl(game_id, tiles):
     if storage_backend == backends.python_runtime:
         games[game_id] = {
                 'tiles': tiles,
                 'win': "",
-                'game_state': []
+                'game_state': [],
+                'turn': 1
                 }
     elif storage_backend == backends.database:
-        pass
+        created_game = Game(game_id=game_id, tiles=tiles)
+        created_game.save()
 
 def is_game_ended(game_id):
     if storage_backend == backends.python_runtime:
@@ -43,43 +50,88 @@ def is_game_ended(game_id):
             return False
         return True
     elif storage_backend == backends.database:
-        pass
+        game = Game.objects.get(game_id=game_id)
+        if game.outcome == OutCome.ND:
+            return False
+        else:
+            return True
 
 def get_tiles(game_id):
     if storage_backend == backends.python_runtime:
         return games[game_id]['tiles']
     elif storage_backend == backends.database:
-        pass
+        return Game.objects.get(game_id=game_id).tiles
 
 def get_game_state(game_id):
     if storage_backend == backends.python_runtime:
         return games[game_id]['game_state']
     elif storage_backend == backends.database:
-        pass
+        game_state = []
+        game = Game.objects.get(game_id=game_id)
+        moves_list = Move.objects.filter(game=game)
+        for i in moves_list:
+            game_state.append([i.player, i.move])
+        return game_state
 
-def del_game_cache(game_id):
-    if storage_backend == backends.python_runtime:
-        del games[game_id]
-    elif storage_backend == backends.database:
-        pass
+# def del_game_cache(game_id):
+    # if storage_backend == backends.python_runtime:
+        # del games[game_id]
+    # elif storage_backend == backends.database:
+        # pass # Nothing to do here
 
 def ret_game_impl(game_id):
     if storage_backend == backends.python_runtime:
         try:
             gameobj = games[game_id]
-            if is_game_ended(game_id):
-                del_game_cache(game_id) # doesn't need to run if the there is some DB as backend
+            # if is_game_ended(game_id):
+                # del_game_cache(game_id) # doesn't need to run if the there is some DB as backend
             return gameobj
         except KeyError:
             return None
     elif storage_backend == backends.database:
-        pass
+        try:
+            game_state = get_game_state(game_id)
+            game = Game.objects.get(game_id=game_id)
 
-def add_move(game_id, move):
+            if game.outcome == OutCome.ND:
+                win = "" 
+            elif game.outcome == OutCome.Draw:
+                win = "-1"
+            else:
+                win = str(game.outcome - 1)
+
+            gameobj = {
+                    'tiles': game.tiles,
+                    'game_state': game_state,
+                    'win': win,
+                    'turn': game.turn
+                    }
+            return gameobj
+        except:
+            return None
+
+def check_turn(game_id, turn): # X: 0, O: 1
     if storage_backend == backends.python_runtime:
-        pass
+        if games[game_id]['turn'] == turn:
+            return True
+        else:
+            return False
     elif storage_backend == backends.database:
-        pass # TODO: Needed replaced to record the move
+        game = Game.objects.get(game_id=game_id)
+        if turn == game.turn:
+            return True
+        else:
+            return False
+
+def add_move(game_id, move): # For expanding the number of player, first check here
+    if storage_backend == backends.python_runtime:
+        games[game_id]['turn'] = 1 - move[0]
+    elif storage_backend == backends.database:
+        game = Game.objects.get(game_id=game_id)
+        game.turn = 1 - game.turn
+        m = Move(game=game, player=move[0], move=move[1])
+        game.save()
+        m.save()
 
 def end_game(game_id, outcome, player):
     if storage_backend == backends.python_runtime:
@@ -88,7 +140,15 @@ def end_game(game_id, outcome, player):
         elif outcome == -1:
             games[game_id]['win'] = "-1"
     elif storage_backend == backends.database:
-        pass
+        game = Game.objects.get(game_id=game_id)
+        if outcome == True:
+            if player == "0":
+                game.outcome = OutCome.XWin
+            elif player == "1":
+                game.outcome = OutCome.OWin
+        elif outcome == -1:
+            game.outcome = OutCome.Draw
+        game.save()
 
 # ======== END Abstractions
 
@@ -195,14 +255,14 @@ def move(game_id, gameobj):
                 return False
 
             # Getting the last move and checking the player
-            game_state = get_game_state(game_id)
-            if len(game_state) == 0 or game_state[-1][0] != int(player):
+            if check_turn(game_id, int(player)):
 
+                game_state = get_game_state(game_id)
                 if check_set(game_state, scal):
                     return False
 
                 game_state.append([int(player), scal])
-                add_move(game_id, [int(player), scal]) # For DataBase Only
+                add_move(game_id, [int(player), scal])
                 outcome = check_win(game_state, tiles, [int(player), scal])
                 end_game(game_id, outcome, player) # Does the checking itself
 
