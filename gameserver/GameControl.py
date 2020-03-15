@@ -16,7 +16,7 @@ class backends:
     python_runtime = 0
     database = 1
 
-storage_backend = backends.python_runtime
+storage_backend = backends.database
 
 # ========= Abstractions
 def id_exists(game_id):
